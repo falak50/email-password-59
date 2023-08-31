@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, updateProfile } from "firebase/auth";
 import app from '../../firebase/firebase.config';
 import { Link } from 'react-router-dom';
  const auth = getAuth(app);
@@ -12,6 +12,9 @@ const Register = () => {
         e.preventDefault();
         const email = e.target.email.value;
         const password = e.target.password.value;
+        const name= e.target.name.value;
+       // console.log('here')
+        console.log(name,email,password);
         setSuccess(''); // no need 
         setError('');
         // e.target.email.value='';
@@ -42,7 +45,8 @@ const Register = () => {
             // event.tager.reset();
             e.target.reset();
             setSuccess('User has been created Successfully')
-            sendVerification(loggedUser);
+            sendVerification(result.user);
+            updateUserData(result.user,name) 
           })
           .catch(e => {
            console.log(e.message);
@@ -56,7 +60,7 @@ const Register = () => {
 
     const sendVerification = (user) => {
         // sendEmailVerification
-        console.log('from sendVerificatio')
+     //   console.log('from sendVerificatio')
         console.log(email);
         sendEmailVerification(user)
         .then(r => {
@@ -65,6 +69,17 @@ const Register = () => {
         })
     }
 
+    const updateUserData = (user,name) => {
+        updateProfile(user,{
+            displayName:name
+        })
+        .then(()=>{
+            console.log('user name updated ')
+        })
+        .catch(e => {
+            setError(e.message);
+        })
+    }
     const handleEmailChange = (e) => {
     // console.log(e.target.value);
      setEmail(e.target.value);
@@ -77,7 +92,9 @@ const Register = () => {
             <h4>please register</h4>
     
             <form onSubmit={handleSubmit}>
-                <input className='w-50 mb-4 rounded ps-2' onChange={handleEmailChange} type="email" name="email" id="id" placeholder='Your email ' required />
+                <input className='w-50 mb-4 rounded ps-2'  type="text" name="name" id="name" placeholder='Your Name' required />
+                <br />
+                <input className='w-50 mb-4 rounded ps-2' onChange={handleEmailChange} type="email" name="email" id="email" placeholder='Your Email ' required />
                 <br />
                 <input className='w-50 mb-4 rounded ps-2' onBlur={handlePasswordBluer} type="password" name='password' placeholder='Your password' required />
                 <br />
